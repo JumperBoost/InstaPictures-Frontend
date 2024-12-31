@@ -39,7 +39,7 @@ function autocomplete() {
   }
 
   abortController = new AbortController();
-  $fetch('/api/search/city/' + input.value, { signal: abortController.signal }).then(res => {
+  $fetch('/api/autocomplete/city/' + input.value, { signal: abortController.signal }).then(res => {
     propals.value = [];
     res = JSON.parse(res);
     for(const i in res) {
