@@ -25,7 +25,7 @@ let abortController: AbortController;
 
 function select(city: City) {
   selected.value = city;
-  input.value = city.get_str();
+  input.value = city.get_str;
 }
 
 function autocomplete() {
