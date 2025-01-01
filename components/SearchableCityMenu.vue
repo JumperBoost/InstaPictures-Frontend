@@ -1,13 +1,10 @@
 <template>
-  <div>
+  <div class="w-full">
     <SearchBar v-model="input" @input="autocomplete" />
     <div class="searchable_suggests">
       <div v-for="city in propals" v-if="!selected" class="[&>*:hover]:animate-pulse [&>*:hover]:text-red-500" @click="select(city)">
         <SearchableCitySuggest :city="city" />
       </div>
-    </div>
-    <div v-if="selected">
-      <img alt="Logo chargement" src="~/assets/img/loading.svg" class="h-10">
     </div>
   </div>
 </template>
@@ -17,19 +14,26 @@ import SearchableCitySuggest from "~/components/SearchableCitySuggest.vue";
 import {City} from "~/types/City";
 import {$fetch} from "ofetch";
 
+const emits = defineEmits<{
+  selected: [city: City|undefined]
+}>();
+
+defineProps({
+  selected: City
+});
+
 const input = ref("");
-const selected = ref<City>();
 const propals = ref<City[]>([]);
 
-let abortController: AbortController;
+let abortController: AbortController|undefined;
 
 function select(city: City) {
-  selected.value = city;
+  emits('selected', city)
   input.value = city.get_str;
 }
 
 function autocomplete() {
-  selected.value = undefined;
+  emits('selected', undefined);
   if(abortController)
     abortController.abort();
 
@@ -41,6 +45,7 @@ function autocomplete() {
   abortController = new AbortController();
   $fetch('/api/autocomplete/city/' + input.value, { signal: abortController.signal }).then(res => {
     propals.value = [];
+    abortController = undefined;
     res = JSON.parse(res);
     for(const i in res) {
       const data = res[i];
@@ -54,10 +59,6 @@ function autocomplete() {
 </script>
 
 <style scoped>
-* {
-  width: 100%;
-}
-
 .searchable_suggests {
   background-color: whitesmoke;
   border-radius: 12px;
