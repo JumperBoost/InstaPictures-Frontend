@@ -15,7 +15,7 @@ import {City} from "~/types/City";
 import {$fetch} from "ofetch";
 
 const emits = defineEmits<{
-  selected: [city: City|undefined]
+  selected: [City|undefined]
 }>();
 
 defineProps({

@@ -1,21 +1,32 @@
 <script setup lang="ts">
 import {Media} from "~/types/Media";
+import MediaContainer from "~/components/MediaContainer.vue";
+import PopupMediaContainer from "~/components/PopupMediaContainer.vue";
 
 const props = defineProps({
-  medias: Array as PropType<Array<Media>>,
+  medias: Array<Media>,
   currentMediaIndex: Number
 });
+
+const showFullscreenMedia = ref(false);
+
+const mediasInLoading = ref<Media[]>([]);
+const resetLoadingMedias = () => {
+  mediasInLoading.value = [];
+  mediasInLoading.value.push(...props.medias!);
+};
+
+watch(() => props.medias!, () => resetLoadingMedias());
+onMounted(() => resetLoadingMedias());
 </script>
 
 <template>
-  <ul class="post-media">
+  <ul class="post-media cursor-pointer" :class="{'loading': mediasInLoading.includes(medias![currentMediaIndex!])}" @click="showFullscreenMedia = true">
     <li v-for="index in medias!.length" :key="index" :style="'transform: translateX(' + (index-currentMediaIndex!-1) * 100 + '%)'">
-      <img alt="Media" v-if="medias![index-1].type == 'image'" :src="'/api/download/' + medias![index-1].url">
-      <video :muted="props.currentMediaIndex != index-1" oncanplay="this.play()" loop v-if="medias![index-1].type == 'video'">
-        <source :src="'/api/download/' + medias![index-1].url">
-      </video>
+      <MediaContainer :media="medias![index-1]" :videoMuteCondition="currentMediaIndex != index-1 || showFullscreenMedia" @loaded="mediasInLoading.splice(mediasInLoading.indexOf(medias![index-1]), 1)" />
     </li>
   </ul>
+  <PopupMediaContainer v-if="showFullscreenMedia" :media="medias![currentMediaIndex!]" @pclose="showFullscreenMedia = false" />
 </template>
 
 <style scoped>

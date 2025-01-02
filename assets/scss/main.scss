@@ -27,3 +27,19 @@ h1 {
   font-size: 30px;
   font-weight: bold;
 }
+
+// Animations
+@keyframes loading {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+.loading {
+  background: linear-gradient(110deg, #2A3335 30%, #4F5A5B 50%, #2A3335 70%);
+  background-size: 400%;
+  animation: loading 1.75s ease-in-out infinite;
+}
