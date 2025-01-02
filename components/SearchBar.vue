@@ -58,8 +58,7 @@ const model = defineModel();
   transform: translateX(20px);
 }
 
-.search-label svg,
-.slash-icon {
+.search-label svg {
   position: absolute;
   color: #7e7e7e;
 }
