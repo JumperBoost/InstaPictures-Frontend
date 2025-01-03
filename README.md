@@ -6,7 +6,7 @@ Ce mini-projet est un site internet dans lequel il est possible de consulter les
 Les médias sont basées sur les données d'Instagram, récoltés via une [API Apify](https://apify.com/apify/instagram-scraper).
 
 Le projet est découpé en deux parties : le **frontend** et le **backend**.
-Dans cette partie, il s'agit du frontend, c'est-à-dire l'affichage et la logique côté client. Le backend est disponible dans un autre [dépôt]().
+Dans cette partie, il s'agit du frontend, c'est-à-dire l'affichage et la logique côté client. Le backend est disponible dans un autre [dépôt](https://github.com/JumperBoost/InstaPictures-Backend/).
 
 ## Technologies utilisées
 - [**Nuxt.js**](https://nuxt.com/) 3 _(framework Vue.js)_ avec [**Node.js**](https://nodejs.org/) 22 pour l'affichage utilisateur
