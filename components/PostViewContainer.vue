@@ -22,8 +22,8 @@ onMounted(() => resetLoadingMedias());
 
 <template>
   <ul class="post-media cursor-pointer" :class="{'loading': mediasInLoading.includes(medias![currentMediaIndex!])}" @click="showFullscreenMedia = true">
-    <li v-for="index in medias!.length" :key="index" :style="'transform: translateX(' + (index-currentMediaIndex!-1) * 100 + '%)'">
-      <MediaContainer :media="medias![index-1]" :videoMuteCondition="currentMediaIndex != index-1 || showFullscreenMedia" @loaded="mediasInLoading.splice(mediasInLoading.indexOf(medias![index-1]), 1)" />
+    <li v-for="(media, index) in medias" :key="media.url" :style="'transform: translateX(' + (index-currentMediaIndex!) * 100 + '%)'">
+      <MediaContainer :media="media" :videoMuteCondition="currentMediaIndex != index || showFullscreenMedia" @loaded="mediasInLoading.splice(mediasInLoading.indexOf(media), 1)" />
     </li>
   </ul>
   <PopupMediaContainer v-if="showFullscreenMedia" :media="medias![currentMediaIndex!]" @pclose="showFullscreenMedia = false" />

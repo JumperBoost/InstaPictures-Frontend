@@ -18,10 +18,6 @@
   z-index: 100;
 }
 
-.popup > * {
-  box-shadow: black 1px 1px 2px 2px;
-}
-
 .popup-buttons > * {
   padding: 0.25rem 0.5rem;
   border: 1px solid black;

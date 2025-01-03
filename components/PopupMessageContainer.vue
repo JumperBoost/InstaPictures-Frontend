@@ -29,5 +29,9 @@ defineProps({
 .popup-msg > h2 {
   font-weight: 700;
   font-size: 2.5rem;
+
+  @media screen and (max-width: 530px) {
+    font-size: 1.75rem;
+  }
 }
 </style>

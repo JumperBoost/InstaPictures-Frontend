@@ -9,7 +9,7 @@ const props = defineProps({
 });
 
 const emits = defineEmits<{
-  result: [found: Boolean]
+  result: [Boolean|null]
 }>();
 
 const topPosts = ref<Post[]>([]);
@@ -25,11 +25,7 @@ const currentPostIndex = ref(0);
 
 const showPopup = ref(false);
 
-onMounted(() => {
-  if(props.selected)
-    search(props.selected);
-  else return; // TODO: Définir un message d'erreur
-});
+onMounted(() => search(props.selected!));
 
 const shuffleArray = (array: any[]) => { // Modification directe du tableau (sans copie)
   for (let i = array.length - 1; i > 0; i--) {
@@ -66,7 +62,13 @@ function search(city: City) {
         addPostInArray(latestPosts, loc['latestPosts'][postI], loc, locId);
     }
     shufflePosts();
-    emits('result', true);
+    // Afficher le popup de contenus sensibles si il y a pas de top posts mais qu'il y a des posts récents
+    if(topPosts.value.length == 0 && latestPosts.value.length > 0)
+      showPopup.value = true;
+
+    if(topPosts.value.length == 0 && latestPosts.value.length == 0)
+      emits('result', null);
+    else emits('result', true);
   }).catch(err => {
     console.log(err);
     emits('result', false);
@@ -87,13 +89,13 @@ function estUnPostSensible(index: number) {
 
 <template>
   <div v-if="posts.length > 0">
-    <PostContainer :post="posts[currentPostIndex]" />
+    <PostContainer :post="posts[currentPostIndex]" class="box" />
     <div class="w-full *:w-7 *:cursor-pointer text-white font-bold flex justify-center p-2 gap-4 [&>*:hover]:animate-pulse">
       <img v-if="currentPostIndex > 1" alt="Icône premier post" title="Premier post" src="~/assets/img/double_arrow_icon.svg" @click="currentPostIndex = 0" :class="{'bg-red-500 rounded-full': estUnPostSensible(0)}">
       <img v-if="currentPostIndex > 0" alt="Icône post précédent" title="Post précédent" src="~/assets/img/arrow_icon.svg" @click="currentPostIndex--" :class="{'bg-red-500 rounded-full': estUnPostSensible(currentPostIndex-1)}">
-      <img v-if="currentPostIndex < posts.length-1" alt="Icône post suivant" title="Post suivant" src="~/assets/img/arrow_icon.svg" @click="currentPostIndex++" class="rotate-180" :class="{'bg-red-500 rounded-full' : estUnPostSensible(currentPostIndex+1)}">
+      <img v-if="currentPostIndex < posts.length-1" alt="Icône post suivant" title="Post suivant" src="~/assets/img/arrow_icon.svg" @click="currentPostIndex++" class="rotate-180" :class="{'bg-red-500 rounded-full': estUnPostSensible(currentPostIndex+1)}">
       <img v-if="currentPostIndex == posts.length-1 && !showLatestPosts" alt="Icône post suivant avec attention" title="Post suivant (Avec attention)" src="~/assets/img/arrow_icon.svg" @click="showPopup = true" class="rotate-180 bg-red-500 rounded-full">
-      <img v-if="currentPostIndex < posts.length-2" alt="Icône dernier post" title="Dernier post" src="~/assets/img/double_arrow_icon.svg" @click="currentPostIndex = posts.length-1" class="rotate-180" :class="{'bg-red-500 rounded-full' : estUnPostSensible(posts.length-1)}">
+      <img v-if="currentPostIndex < posts.length-2" alt="Icône dernier post" title="Dernier post" src="~/assets/img/double_arrow_icon.svg" @click="currentPostIndex = posts.length-1" class="rotate-180" :class="{'bg-red-500 rounded-full': estUnPostSensible(posts.length-1)}">
     </div>
   </div>
   <PopupMessageContainer v-if="showPopup" title="⚠️ Contenus sensibles">
@@ -109,5 +111,15 @@ function estUnPostSensible(index: number) {
 </template>
 
 <style scoped>
+.popup-msg {
+  @media screen and (min-width: 385px) and (max-width: 530px) {
+    p { font-size: 1rem; line-height: 150% }
+    .popup-buttons { font-size: 1rem }
+  }
 
+  @media screen and (max-width: 385px) {
+    p { font-size: 0.75rem; line-height: 150% }
+    .popup-buttons { font-size: 0.75rem }
+  }
+}
 </style>
