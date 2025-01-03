@@ -30,7 +30,7 @@ watch(() => hasAcceptedCGU.value, () => localStorage.hasAcceptedCGU = Boolean(ha
     <div v-if="selected" class="w-full">
       <div v-if="selectedResult === undefined" class="flex flex-col items-center">
         <img alt="Logo chargement" src="~/assets/img/loading.svg" class="h-10">
-        <p>Les posts sont en cours de chargement, veuillez patientez un instant. Cela prend généralement moins d'une minute.</p>
+        <p>Les posts sont en cours de chargement, veuillez patienter un instant. Cela prend généralement moins d'une minute.</p>
       </div>
       <p v-if="selectedResult === false" class="text-red-500">Une erreur est survenue lors du chargement des posts.</p>
       <p v-if="selectedResult === null" class="text-red-500">Aucun post n'a été trouvé avec la ville sélectionnée.</p>
@@ -45,8 +45,8 @@ watch(() => hasAcceptedCGU.value, () => localStorage.hasAcceptedCGU = Boolean(ha
       </div>
       <div>
         <p>Les médias étant basés sur des publications réelles <a href="https://www.instagram.com/" target="_blank" class="italic">Instagram</a>, en naviguant sur notre site, vous vous engagez à respecter les <a href="https://help.instagram.com/581066165581870/?locale=fr_FR&hl=fr-fr" target="_blank" class="font-bold">CGU</a> d'Instagram.</p>
-        <p>Vous accepterez également d'utiliser à bon escient notre site internet, et de n'effectuer aucun actes nuisibles.</p>
-        <p>Toute violation de ces conditions d'utilisations est interdite, et peut faire l'objet de poursuites judiciaires.</p>
+        <p>Vous accepterez également d'utiliser à bon escient notre site internet, et de n'effectuer aucun acte nuisible.</p>
+        <p>Toute violation de ces conditions d'utilisation est interdite, et peut faire l'objet de poursuites judiciaires.</p>
       </div>
       <div class="popup-buttons flex gap-5">
         <div class="bg-green-500" @click="hasAcceptedCGU = true">Accepter - Entrer</div>
