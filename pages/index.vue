@@ -4,6 +4,7 @@ import {City} from "~/types/City";
 const selected = ref<City>();
 const selectedResult = ref<Boolean|null>();
 const hasAcceptedCGU = ref<Boolean>();
+const hasAcceptedSensibleContent = ref<Boolean>(false);
 
 const handleSelectedCity = (city?: City) => {
   selected.value = city;
@@ -11,6 +12,7 @@ const handleSelectedCity = (city?: City) => {
     selectedResult.value = undefined;
 };
 const handleSelectedResult = (found: Boolean|null) => selectedResult.value = found;
+const handleAcceptedSensibleContent = (accepted: Boolean) => hasAcceptedSensibleContent.value = accepted;
 
 onMounted(() => {
   if(localStorage.hasAcceptedCGU)
@@ -34,7 +36,7 @@ watch(() => hasAcceptedCGU.value, () => localStorage.hasAcceptedCGU = Boolean(ha
       </div>
       <p v-if="selectedResult === false" class="text-red-500">Une erreur est survenue lors du chargement des posts.</p>
       <p v-if="selectedResult === null" class="text-red-500">Aucun post n'a été trouvé avec la ville sélectionnée.</p>
-      <PostListContainer :selected="selected" @result="handleSelectedResult" />
+      <PostListContainer :selected="selected" :hasAcceptedSensibleContent="hasAcceptedSensibleContent" @result="handleSelectedResult" @accepted-sensible-content="handleAcceptedSensibleContent" />
     </div>
     <PopupMessageContainer v-if="hasAcceptedCGU == false">
       <img alt="Logo InstaPictures" src="~/assets/img/logo_icon.png" class="w-20" />

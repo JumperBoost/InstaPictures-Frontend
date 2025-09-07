@@ -23,7 +23,7 @@ const getInstagramUrl = () => "https://instagram.com/";
         <div class="flex flex-row items-center gap-2">
           <a :href="getInstagramUrl() + post!.username" target="_blank"><img class="post-pic loading w-12 h-12 rounded-full" alt="Photo de profil" :src="'/api/download/' + post!.picUrl" :key="post!.picUrl"></a>
           <div class="flex flex-col text-sm text-start flex-1">
-            <div class="line-clamp-1" :title="post!.fullname + ' (@' + post!.username + ')'"><a :href="getInstagramUrl() + post!.username" target="_blank">{{ post!.fullname }} (@{{ post!.username }})</a></div>
+            <div class="line-clamp-1" :title="'@' + post!.username"><a :href="getInstagramUrl() + post!.username" target="_blank">@{{ post!.username }}</a></div>
             <a :href="getInstagramUrl() + 'explore/locations/' + post!.locationId" target="_blank">
               <div class="flex gap-1">
                 <img class="w-4" alt="Icône location" src="~/assets/img/location_icon.svg">

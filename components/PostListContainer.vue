@@ -5,22 +5,18 @@ import {$fetch} from "ofetch";
 import {Media} from "~/types/Media";
 
 const props = defineProps({
-  selected: City
+  selected: City,
+  hasAcceptedSensibleContent: Boolean
 });
 
 const emits = defineEmits<{
-  result: [Boolean|null]
+  result: [Boolean|null],
+  'accepted-sensible-content': [Boolean]
 }>();
 
-const topPosts = ref<Post[]>([]);
-const latestPosts = ref<Post[]>([]);
+const posts = ref<Post[]>([]);
 
-const showLatestPosts = ref(false);
-const posts = computed(() => {
-  if(showLatestPosts.value)
-    return topPosts.value.concat(latestPosts.value);
-  return topPosts.value;
-});
+const showPosts = ref(props.hasAcceptedSensibleContent);
 const currentPostIndex = ref(0);
 
 const showPopup = ref(false);
@@ -35,8 +31,7 @@ const shuffleArray = (array: any[]) => { // Modification directe du tableau (san
 };
 
 const shufflePosts = () => {
-  shuffleArray(topPosts.value);
-  shuffleArray(latestPosts.value);
+  shuffleArray(posts.value);
 };
 
 function addPostInArray(postsRef: Ref<Post[]>, postArray: any, locArray: any, locId: string) {
@@ -45,28 +40,25 @@ function addPostInArray(postsRef: Ref<Post[]>, postArray: any, locArray: any, lo
     const media = postArray['medias'][mediaI];
     medias.push(new Media(media['type'], media['url']));
   }
-  postsRef.value.push(new Post(postArray['code'], postArray['text'], postArray['date'], locId, locArray['location_name'], postArray['username'], postArray['fullname'],
+  postsRef.value.push(new Post(postArray['code'], postArray['text'], postArray['date'], locId, locArray['location_name'], postArray['username'],
       postArray['pic'], postArray['likeCount'], postArray['commentCount'], medias));
 }
 
 function search(city: City) {
   $fetch('/api/search/city/' + city.name + ' ' + city.country).then(res => {
-    topPosts.value = [];
-    latestPosts.value = [];
+    posts.value = [];
     res = JSON.parse(res);
     for(const locId in res) {
       const loc = res[locId];
-      for(const postI in loc['topPosts'])
-        addPostInArray(topPosts, loc['topPosts'][postI], loc, locId);
-      for(const postI in loc['latestPosts'])
-        addPostInArray(latestPosts, loc['latestPosts'][postI], loc, locId);
+      for(const postI in loc['posts'])
+        addPostInArray(posts, loc['posts'][postI], loc, locId);
     }
     shufflePosts();
-    // Afficher le popup de contenus sensibles si il y a pas de top posts mais qu'il y a des posts récents
-    if(topPosts.value.length == 0 && latestPosts.value.length > 0)
+    // Afficher le popup de contenus sensibles s'il a jamais été affiché et qu'il y a des posts
+    if(showPosts.value === false && posts.value.length > 0)
       showPopup.value = true;
 
-    if(topPosts.value.length == 0 && latestPosts.value.length == 0)
+    if(posts.value.length == 0)
       emits('result', null);
     else emits('result', true);
   }).catch(err => {
@@ -75,36 +67,31 @@ function search(city: City) {
   });
 }
 
-function afficherPostsRecents() {
+function afficherPosts() {
   showPopup.value = false;
-  showLatestPosts.value = true;
-  if(posts.value.length - 1 > currentPostIndex.value)
-    currentPostIndex.value++;
-}
-
-function estUnPostSensible(index: number) {
-  return latestPosts.value.includes(posts.value[index]);
+  showPosts.value = true;
+  emits('accepted-sensible-content', true);
 }
 </script>
 
 <template>
-  <div v-if="posts.length > 0">
+  <div v-if="posts.length > 0 && showPosts">
     <PostContainer :post="posts[currentPostIndex]" class="box" />
     <div class="w-full *:w-7 *:cursor-pointer text-white font-bold flex justify-center p-2 gap-4 [&>*:hover]:animate-pulse">
-      <img v-if="currentPostIndex > 1" alt="Icône premier post" title="Premier post" src="~/assets/img/double_arrow_icon.svg" @click="currentPostIndex = 0" :class="{'bg-red-500 rounded-full': estUnPostSensible(0)}">
-      <img v-if="currentPostIndex > 0" alt="Icône post précédent" title="Post précédent" src="~/assets/img/arrow_icon.svg" @click="currentPostIndex--" :class="{'bg-red-500 rounded-full': estUnPostSensible(currentPostIndex-1)}">
-      <img v-if="currentPostIndex < posts.length-1" alt="Icône post suivant" title="Post suivant" src="~/assets/img/arrow_icon.svg" @click="currentPostIndex++" class="rotate-180" :class="{'bg-red-500 rounded-full': estUnPostSensible(currentPostIndex+1)}">
-      <img v-if="currentPostIndex == posts.length-1 && !showLatestPosts" alt="Icône post suivant avec attention" title="Post suivant (Avec attention)" src="~/assets/img/arrow_icon.svg" @click="showPopup = true" class="rotate-180 bg-red-500 rounded-full">
-      <img v-if="currentPostIndex < posts.length-2" alt="Icône dernier post" title="Dernier post" src="~/assets/img/double_arrow_icon.svg" @click="currentPostIndex = posts.length-1" class="rotate-180" :class="{'bg-red-500 rounded-full': estUnPostSensible(posts.length-1)}">
+      <img v-if="currentPostIndex > 1" alt="Icône premier post" title="Premier post" src="~/assets/img/double_arrow_icon.svg" @click="currentPostIndex = 0">
+      <img v-if="currentPostIndex > 0" alt="Icône post précédent" title="Post précédent" src="~/assets/img/arrow_icon.svg" @click="currentPostIndex--">
+      <img v-if="currentPostIndex < posts.length-1" alt="Icône post suivant" title="Post suivant" src="~/assets/img/arrow_icon.svg" @click="currentPostIndex++" class="rotate-180">
+      <img v-if="currentPostIndex == posts.length-1 && !showPosts" alt="Icône post suivant avec attention" title="Post suivant (Avec attention)" src="~/assets/img/arrow_icon.svg" @click="showPopup = true" class="rotate-180 bg-red-500 rounded-full">
+      <img v-if="currentPostIndex < posts.length-2" alt="Icône dernier post" title="Dernier post" src="~/assets/img/double_arrow_icon.svg" @click="currentPostIndex = posts.length-1" class="rotate-180">
     </div>
   </div>
-  <PopupMessageContainer v-if="showPopup" title="⚠️ Contenus sensibles">
+  <PopupMessageContainer v-if="!showPosts && showPopup" title="⚠️ Contenus sensibles">
     <p><i>Instagram</i>, comme tout réseau social, contient des utilisateurs indésirables, pouvant publier du contenu heurtant la sensibilité d'autrui.</p>
     <p>Dépendant entièrement de la plateforme <i>Instagram</i>, <u>nous ne tenons pas responsable du contenu de ces posts</u>.</p>
     <br>
-    <p class="font-bold">Acceptez-vous de continuer et d'afficher les posts récents ?</p>
+    <p class="font-bold">Acceptez-vous de continuer ?</p>
     <div class="popup-buttons flex gap-5">
-      <div class="bg-green-500" @click="afficherPostsRecents">Accepter</div>
+      <div class="bg-green-500" @click="afficherPosts">Accepter</div>
       <div class="bg-red-500" @click="showPopup = false">Refuser</div>
     </div>
   </PopupMessageContainer>
